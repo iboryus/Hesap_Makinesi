@@ -11,6 +11,83 @@ giris_alani.insert(0, "0")
 for i in range(4):
     pencere.grid_columnconfigure(i, weight=1)
 
+#Hafıza
+current_expression = ""
+first_number = None
+operator = None
+is_new_number = True
+
+#Fonksiyonlar
+
+def clear_all():
+    global current_expression, first_number, operator, is_new_number
+    current_expression = ""
+    first_number = None
+    operator = None
+    is_new_number = True
+    giris_alani.delete(0, tk.END)
+    giris_alani.insert(0, "0")
+
+def button_click(char):
+    """Sayı ve nokta düğmelerine basıldığında çalışır."""
+    global current_expression, is_new_number
+
+    if is_new_number:
+        giris_alani.delete(0, tk.END)
+        is_new_number = False
+
+    if giris_alani.get() == "0" and char != ".":
+        giris_alani.delete(0, tk.END)
+
+    if char == '.' and '.' in giris_alani.get():
+        return 
+    
+    giris_alani.insert(tk.END, char)
+    current_expression = giris_alani.get()
+
+def set_operator(op):
+    """Operatör düğmelerine (+,-,*,/) basıldığında çalışır."""
+    global first_number, operator, is_new_number, current_expression
+    if current_expression:
+        first_number = float(current_expression)
+        operator = op
+        is_new_number = True
+
+    def calculate():
+        """Eşittir (=) düğmesine basıldığında çalışır."""
+        global first_number, operator, is_new_number, current_expression
+        if first_number is None or operator is None or not current_expression:
+            return
+        
+        second_number = float(current_expression)
+        result = 0
+
+        if operator == '+':
+            result = first_number + second_number
+        elif operator == '-':
+            result = first_number - second_number
+        elif operator == '*':
+            result = first_number * second_number
+        elif operator == '/':
+            if second_number == 0:
+                giris_alani.delete(0, tk.END)
+                giris_alani.insert(0, "Hata")
+                first_number = None
+                operator = None
+                is_new_number = True
+                return
+            result= first_number / second_number
+        
+        giris_alani.delete(0, tk.END)
+        if result == int(result):
+            giris_alani.insert(0, str(int(result)))
+        else:
+            giris_alani.insert(0, str(result))
+        
+        first_number = result
+        operator = None
+        is_new_number = True
+
 
 #Düğmeler
 
@@ -26,7 +103,7 @@ for (text, row, col) in dugme_duzeni:
     dugme.grid(row=row, column=col, sticky="nsew", padx=5, pady=5)
 
 #Clear Tuşu
-temizle_dugmesi = tk.Button(pencere, text='C', font=('Arial', 18), padx=20, pady=20, bg='red', fg='white')
+temizle_dugmesi = tk.Button(pencere, text='C', font=('Arial', 18), padx=20, pady=20, bg='red', fg='black')
 temizle_dugmesi.grid(row=5, column=0, columnspan=4, sticky="nsew", padx=5, pady=5)
 
 for i in range(1, 6):
